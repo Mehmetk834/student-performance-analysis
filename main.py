@@ -1,5 +1,6 @@
 import json
 import numpy as np
+import matplotlib.pyplot as plt
 
 try:
     with open("ogrenciler.json", "r") as file:
@@ -20,6 +21,7 @@ while True:
     print("5) En Başarılı Öğrenci")
     print("6) Çıkış")
     print("7) Öğrenci Sil")
+    print("8) Grafik Göster")
 
     secim = input("Seçiminizi girin: ")
 
@@ -31,7 +33,7 @@ while True:
         else:
             ogrenciler[isim] = []
             kaydet()
-            print(f"{isim} başarıyla eklendi.")
+            print(f"{isim} adlı öğrenci başarıyla eklendi.")
 
     elif secim == "2":
         isim = input("Not eklenecek öğrencinin adını girin: ")
@@ -45,16 +47,16 @@ while True:
                     kaydet()
                     print(f"{isim} için not başarıyla eklendi.")
                 else:
-                    print("Not 0 ile 100 arasında olmalıdır.")
+                    print("Not değeri 0 ile 100 arasında olmalıdır.")
 
             except:
-                print("Geçersiz giriş! Lütfen sayısal bir değer girin.")
+                print("Geçersiz giriş. Lütfen sayısal bir değer girin.")
         else:
             print("Girilen isimde bir öğrenci bulunamadı.")
 
     elif secim == "3":
         if len(ogrenciler) == 0:
-            print("Henüz kayıtlı öğrenci bulunmamaktadır.")
+            print("Sistemde kayıtlı öğrenci bulunmamaktadır.")
         else:
             print("\n--- Öğrenci Listesi ---")
             for isim, notlar in ogrenciler.items():
@@ -62,9 +64,9 @@ while True:
 
     elif secim == "4":
         if len(ogrenciler) == 0:
-            print("Henüz analiz yapılacak öğrenci bulunmamaktadır.")
+            print("Analiz yapılabilecek veri bulunmamaktadır.")
         else:
-            print("\n--- Detaylı Analiz ---")
+            print("\n--- Detaylı Analiz Sonuçları ---")
 
             tum_notlar = []
 
@@ -77,12 +79,9 @@ while True:
                     en_dusuk = np.min(notlar)
                     std = np.std(notlar)
 
-                    if ortalama >= 50:
-                        durum = "Geçti"
-                    else:
-                        durum = "Kaldı"
+                    durum = "Geçti" if ortalama >= 50 else "Kaldı"
 
-                    print(f"{isim} -> Ortalama: {round(ortalama,2)} | Max: {en_yuksek} | Min: {en_dusuk} | Std: {round(std,2)} | Durum: {durum}")
+                    print(f"{isim} -> Ortalama: {round(ortalama,2)} | En Yüksek: {en_yuksek} | En Düşük: {en_dusuk} | Std: {round(std,2)} | Durum: {durum}")
 
                     tum_notlar.extend(notlar)
 
@@ -91,29 +90,26 @@ while True:
                 print(f"\nSınıf Ortalaması: {round(genel_ortalama,2)}")
 
     elif secim == "5":
-        if len(ogrenciler) == 0:
-            print("Henüz değerlendirme yapılacak veri bulunmamaktadır.")
+        en_iyi = ""
+        en_yuksek = 0
+
+        for isim, notlar in ogrenciler.items():
+            if len(notlar) > 0:
+                ortalama = np.mean(notlar)
+
+                if ortalama > en_yuksek:
+                    en_yuksek = ortalama
+                    en_iyi = isim
+
+        if en_iyi == "":
+            print("Değerlendirme yapılacak yeterli veri bulunmamaktadır.")
         else:
-            en_iyi = ""
-            en_yuksek = 0
-
-            for isim, notlar in ogrenciler.items():
-                if len(notlar) > 0:
-                    ortalama = np.mean(notlar)
-
-                    if ortalama > en_yuksek:
-                        en_yuksek = ortalama
-                        en_iyi = isim
-
-            if en_iyi == "":
-                print("Hiçbir öğrenci için not girilmemiş.")
-            else:
-                print("\n--- En Başarılı Öğrenci ---")
-                print(f"Öğrenci: {en_iyi}")
-                print(f"Ortalama: {round(en_yuksek,2)}")
+            print("\n--- En Başarılı Öğrenci ---")
+            print(f"Öğrenci: {en_iyi}")
+            print(f"Ortalama: {round(en_yuksek,2)}")
 
     elif secim == "6":
-        print("Program sonlandırıldı.")
+        print("Çıkış yapıldı.")
         break
 
     elif secim == "7":
@@ -122,9 +118,30 @@ while True:
         if isim in ogrenciler:
             del ogrenciler[isim]
             kaydet()
-            print(f"{isim} silindi.")
+            print(f"{isim} adlı öğrenci sistemden silindi.")
         else:
-            print("Böyle bir öğrenci bulunamadı.")
+            print("Belirtilen isimde bir öğrenci bulunamadı.")
+
+    elif secim == "8":
+        isimler = []
+        ortalamalar = []
+
+        for isim, notlar in ogrenciler.items():
+            if len(notlar) > 0:
+                isimler.append(isim)
+                ortalamalar.append(np.mean(notlar))
+
+        if len(isimler) == 0:
+            print("Grafik oluşturmak için yeterli veri yoktur.")
+        else:
+            plt.figure()
+            plt.bar(isimler, ortalamalar)
+            plt.title("Öğrenci Ortalama Notları")
+            plt.xlabel("Öğrenciler")
+            plt.ylabel("Ortalama")
+            plt.xticks(rotation=45)
+            plt.tight_layout()
+            plt.show()
 
     else:
-        print("Geçersiz seçim yaptınız. Lütfen tekrar deneyin.")
+        print("Geçersiz seçim. Lütfen menüdeki seçeneklerden birini girin.")
