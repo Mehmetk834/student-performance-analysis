@@ -4,144 +4,144 @@ import matplotlib.pyplot as plt
 
 try:
     with open("ogrenciler.json", "r") as file:
-        ogrenciler = json.load(file)
+        students = json.load(file)
 except FileNotFoundError:
-    ogrenciler = {}
+    students = {}
 
-def kaydet():
+def save():
     with open("ogrenciler.json", "w") as file:
-        json.dump(ogrenciler, file, indent=4)
+        json.dump(students, file, indent=4)
 
 while True:
-    print("\n===== Öğrenci Performans Sistemi =====")
-    print("1) Öğrenci Ekle")
-    print("2) Not Ekle")
-    print("3) Öğrencileri Listele")
-    print("4) Detaylı Analiz")
-    print("5) En Başarılı Öğrenci")
-    print("6) Çıkış")
-    print("7) Öğrenci Sil")
-    print("8) Grafik Göster")
+    print("\n===== Student Performance System =====")
+    print("1) Add Student")
+    print("2) Add Grade")
+    print("3) List Students")
+    print("4) Detailed Analysis")
+    print("5) Top Student")
+    print("6) Exit")
+    print("7) Delete Student")
+    print("8) Show Chart")
 
-    secim = input("Seçiminizi girin: ")
+    choice = input("Enter your choice: ")
 
-    if secim == "1":
-        isim = input("Öğrenci adı girin: ")
+    if choice == "1":
+        name = input("Enter student name: ")
 
-        if isim in ogrenciler:
-            print("Bu isimde bir öğrenci zaten kayıtlı.")
+        if name in students:
+            print("A student with this name is already registered.")
         else:
-            ogrenciler[isim] = []
-            kaydet()
-            print(f"{isim} adlı öğrenci başarıyla eklendi.")
+            students[name] = []
+            save()
+            print(f"Student named {name} has been successfully added.")
 
-    elif secim == "2":
-        isim = input("Not eklenecek öğrencinin adını girin: ")
+    elif choice == "2":
+        name = input("Enter the name of the student to add a grade: ")
 
-        if isim in ogrenciler:
+        if name in students:
             try:
-                not_degeri = int(input("Not girin (0-100): "))
+                grade = int(input("Enter grade (0-100): "))
 
-                if 0 <= not_degeri <= 100:
-                    ogrenciler[isim].append(not_degeri)
-                    kaydet()
-                    print(f"{isim} için not başarıyla eklendi.")
+                if 0 <= grade <= 100:
+                    students[name].append(grade)
+                    save()
+                    print(f"Grade has been successfully added for {name}.")
                 else:
-                    print("Not değeri 0 ile 100 arasında olmalıdır.")
+                    print("Grade must be between 0 and 100.")
 
             except:
-                print("Geçersiz giriş. Lütfen sayısal bir değer girin.")
+                print("Invalid input. Please enter a numeric value.")
         else:
-            print("Girilen isimde bir öğrenci bulunamadı.")
+            print("No student found with the given name.")
 
-    elif secim == "3":
-        if len(ogrenciler) == 0:
-            print("Sistemde kayıtlı öğrenci bulunmamaktadır.")
+    elif choice == "3":
+        if len(students) == 0:
+            print("There are no students registered in the system.")
         else:
-            print("\n--- Öğrenci Listesi ---")
-            for isim, notlar in ogrenciler.items():
-                print(f"{isim} -> Notlar: {notlar}")
+            print("\n--- Student List ---")
+            for name, grades in students.items():
+                print(f"{name} -> Grades: {grades}")
 
-    elif secim == "4":
-        if len(ogrenciler) == 0:
-            print("Analiz yapılabilecek veri bulunmamaktadır.")
+    elif choice == "4":
+        if len(students) == 0:
+            print("No data available for analysis.")
         else:
-            print("\n--- Detaylı Analiz Sonuçları ---")
+            print("\n--- Detailed Analysis Results ---")
 
-            tum_notlar = []
+            all_grades = []
 
-            for isim, notlar in ogrenciler.items():
-                if len(notlar) == 0:
-                    print(f"{isim} -> Henüz not girilmemiş.")
+            for name, grades in students.items():
+                if len(grades) == 0:
+                    print(f"{name} -> No grades entered yet.")
                 else:
-                    ortalama = np.mean(notlar)
-                    en_yuksek = np.max(notlar)
-                    en_dusuk = np.min(notlar)
-                    std = np.std(notlar)
+                    average = np.mean(grades)
+                    highest = np.max(grades)
+                    lowest = np.min(grades)
+                    std = np.std(grades)
 
-                    durum = "Geçti" if ortalama >= 50 else "Kaldı"
+                    status = "Passed" if average >= 50 else "Failed"
 
-                    print(f"{isim} -> Ortalama: {round(ortalama,2)} | En Yüksek: {en_yuksek} | En Düşük: {en_dusuk} | Std: {round(std,2)} | Durum: {durum}")
+                    print(f"{name} -> Average: {round(average,2)} | Highest: {highest} | Lowest: {lowest} | Std: {round(std,2)} | Status: {status}")
 
-                    tum_notlar.extend(notlar)
+                    all_grades.extend(grades)
 
-            if len(tum_notlar) > 0:
-                genel_ortalama = np.mean(tum_notlar)
-                print(f"\nSınıf Ortalaması: {round(genel_ortalama,2)}")
+            if len(all_grades) > 0:
+                overall_average = np.mean(all_grades)
+                print(f"\nClass Average: {round(overall_average,2)}")
 
-    elif secim == "5":
-        en_iyi = ""
-        en_yuksek = 0
+    elif choice == "5":
+        best = ""
+        highest_avg = 0
 
-        for isim, notlar in ogrenciler.items():
-            if len(notlar) > 0:
-                ortalama = np.mean(notlar)
+        for name, grades in students.items():
+            if len(grades) > 0:
+                average = np.mean(grades)
 
-                if ortalama > en_yuksek:
-                    en_yuksek = ortalama
-                    en_iyi = isim
+                if average > highest_avg:
+                    highest_avg = average
+                    best = name
 
-        if en_iyi == "":
-            print("Değerlendirme yapılacak yeterli veri bulunmamaktadır.")
+        if best == "":
+            print("Not enough data to evaluate.")
         else:
-            print("\n--- En Başarılı Öğrenci ---")
-            print(f"Öğrenci: {en_iyi}")
-            print(f"Ortalama: {round(en_yuksek,2)}")
+            print("\n--- Top Student ---")
+            print(f"Student: {best}")
+            print(f"Average: {round(highest_avg,2)}")
 
-    elif secim == "6":
-        print("Çıkış yapıldı.")
+    elif choice == "6":
+        print("Exited.")
         break
 
-    elif secim == "7":
-        isim = input("Silinecek öğrencinin adını girin: ")
+    elif choice == "7":
+        name = input("Enter the name of the student to delete: ")
 
-        if isim in ogrenciler:
-            del ogrenciler[isim]
-            kaydet()
-            print(f"{isim} adlı öğrenci sistemden silindi.")
+        if name in students:
+            del students[name]
+            save()
+            print(f"Student named {name} has been deleted from the system.")
         else:
-            print("Belirtilen isimde bir öğrenci bulunamadı.")
+            print("No student found with the given name.")
 
-    elif secim == "8":
-        isimler = []
-        ortalamalar = []
+    elif choice == "8":
+        names = []
+        averages = []
 
-        for isim, notlar in ogrenciler.items():
-            if len(notlar) > 0:
-                isimler.append(isim)
-                ortalamalar.append(np.mean(notlar))
+        for name, grades in students.items():
+            if len(grades) > 0:
+                names.append(name)
+                averages.append(np.mean(grades))
 
-        if len(isimler) == 0:
-            print("Grafik oluşturmak için yeterli veri yoktur.")
+        if len(names) == 0:
+            print("Not enough data to create a chart.")
         else:
             plt.figure()
-            plt.bar(isimler, ortalamalar)
-            plt.title("Öğrenci Ortalama Notları")
-            plt.xlabel("Öğrenciler")
-            plt.ylabel("Ortalama")
+            plt.bar(names, averages)
+            plt.title("Student Average Grades")
+            plt.xlabel("Students")
+            plt.ylabel("Average")
             plt.xticks(rotation=45)
             plt.tight_layout()
             plt.show()
 
     else:
-        print("Geçersiz seçim. Lütfen menüdeki seçeneklerden birini girin.")
+        print("Invalid choice. Please select one of the options from the menu.")
